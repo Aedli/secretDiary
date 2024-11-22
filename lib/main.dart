@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mypage/accountpage/account_page.dart';
-
+import 'routes.dart'; // routes.dart 파일 import
+/* todo Firebase
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+*/
 
 void main() {
   runApp(const MyApp());
@@ -13,12 +17,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Secret Diary',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: AccountPage(),
+      // 라우트를 AppRoutes에서 가져옴
+      initialRoute: AppRoutes.login,
+      routes: AppRoutes.getRoutes(),
     );
   }
 }
