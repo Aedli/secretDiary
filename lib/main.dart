@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mypage/accountpage/account_page.dart';
-
+import 'package:mypage/tappage/tapPage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: AccountPage(),
+      home: TapPage(),
     );
   }
 }

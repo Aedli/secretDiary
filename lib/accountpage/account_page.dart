@@ -5,7 +5,7 @@ import 'package:mypage/memberdelete/deletemeber.dart';
 import '../secretnumchange/secretnum_change.dart';
 
 class AccountPage extends StatelessWidget {
-  AccountPage({super.key});
+  const AccountPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -105,34 +105,34 @@ class AccountPage extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-            icon: Container(
-              width: 40.0, // 원의 크기
-              height: 40.0,
-              decoration: BoxDecoration(
-                color: Colors.blue, // 원 배경 색상
-                shape: BoxShape.circle, // 원 모양
-              ),
-              child: Icon(
-                Icons.menu,
-                color: Colors.white, // 아이콘 색상
-                size: 24.0, // 아이콘 크기
-              ),
-            ),
-            label: '다이어리', //last parameter comma
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.edit),
-            label: '글쓰기', //last parameter comma
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_2_outlined),
-            label: '마이페이지', //last parameter comma
-          ),
-        ], //reformat code : ctrl+alt+l
-      ),
+      // bottomNavigationBar: BottomNavigationBar(
+      //   items: [
+      //     BottomNavigationBarItem(
+      //       icon: Container(
+      //         width: 40.0, // 원의 크기
+      //         height: 40.0,
+      //         decoration: BoxDecoration(
+      //           color: Colors.blue, // 원 배경 색상
+      //           shape: BoxShape.circle, // 원 모양
+      //         ),
+      //         child: Icon(
+      //           Icons.menu,
+      //           color: Colors.white, // 아이콘 색상
+      //           size: 24.0, // 아이콘 크기
+      //         ),
+      //       ),
+      //       label: '다이어리', //last parameter comma
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.edit),
+      //       label: '글쓰기', //last parameter comma
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.person_2_outlined),
+      //       label: '마이페이지', //last parameter comma
+      //     ),
+      //   ], //reformat code : ctrl+alt+l
+      // ),
     );
     // TODO: implement build
     throw UnimplementedError();
