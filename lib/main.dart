@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mypage/accountpage/account_page.dart';
 import 'package:mypage/tappage/tapPage.dart';
 
 void main() {
