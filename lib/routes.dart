@@ -19,7 +19,7 @@ class AppRoutes {
       login: (context) => const LoginScreen(),
       forgotPassword: (context) => ForgotPasswordScreen(),
       signUp: (context) => SignUpScreen(),
-      account: (context) => AccountPage(),
+      account: (context) => const AccountPage(),
       tapPage: (context) => const TapPage(),
     };
   }
