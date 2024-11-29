@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:mypage/accountpage/account_page.dart';
 import 'routes.dart'; // routes.dart 파일 import
 /* todo Firebase
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 */
-import 'package:mypage/tappage/tapPage.dart';
 
 void main() {
   runApp(const MyApp());
