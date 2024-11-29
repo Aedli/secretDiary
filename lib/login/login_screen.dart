@@ -123,7 +123,7 @@ class _LoginFormState extends State<LoginForm> {
     if (email == UserInfo.validID && password == UserInfo.validPassword) {
       showSuccessDialog(context, Message.loginSuccessMessage, () {
         // 성공적으로 로그인 후 AccountPage로 이동
-        Navigator.pushReplacementNamed(context, AppRoutes.account); // 라우트를 사용하여 AccountPage로 이동
+        Navigator.pushReplacementNamed(context, AppRoutes.tapPage); // 라우트를 사용하여 AccountPage로 이동
       });
     } else {
       showErrorDialog(context, Message.loginErrorMessage); // context 전달
