@@ -7,7 +7,6 @@ class ForgotPasswordScreen extends StatelessWidget {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _contactController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _favoriteFoodController = TextEditingController();
 
   // ValueNotifiers
   final ValueNotifier<String> _usernameNotifier = ValueNotifier('');
@@ -17,13 +16,13 @@ class ForgotPasswordScreen extends StatelessWidget {
   final ValueNotifier<String> _passwordErrorNotifier =
   ValueNotifier('');
 
-  ForgotPasswordScreen({super.key}); // 비밀번호 찾기 오류
+  ForgotPasswordScreen({super.key}); // 비밀번호 재설정 오류
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('아이디&비밀번호 찾기'),
+        title: const Text('아이디&비밀번호 재설정'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -103,7 +102,7 @@ class ForgotPasswordScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            // 비밀번호 찾기 박스
+            // 비밀번호 재설정 박스
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
@@ -124,10 +123,6 @@ class ForgotPasswordScreen extends StatelessWidget {
                     controller: _usernameController,
                     decoration: const InputDecoration(labelText: '아이디'),
                   ),
-                  TextField(
-                    controller: _favoriteFoodController,
-                    decoration: const InputDecoration(labelText: '가장 좋아하는 음식'),
-                  ),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
@@ -142,7 +137,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                       ),
                     ),
                     child: const Text(
-                      '비밀번호 찾기',
+                      '비밀번호 재설정',
                       style: TextStyle(
                           color: AppConstants.buttonTextColor), // 버튼 텍스트 색상
                     ),
@@ -152,7 +147,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                     valueListenable: _passwordNotifier,
                     builder: (context, password, child) {
                       return password.isNotEmpty
-                          ? Text('비밀번호: $password',
+                          ? Text('비밀번호 재설정 메시지: $password',
                           style: AppConstants.successMessageStyle)
                           : Container();
                     },
@@ -205,7 +200,7 @@ class ForgotPasswordScreen extends StatelessWidget {
     }
   }
 
-  // 비밀번호 찾기 함수
+  // 비밀번호 재설정 함수
   Future<void> _resetPassword(BuildContext context, String email) async {
     if (email.isEmpty) {
       _passwordErrorNotifier.value = '이메일을 입력하세요.'; // 오류 메시지

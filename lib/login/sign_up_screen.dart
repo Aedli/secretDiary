@@ -15,7 +15,6 @@ class SignUpScreen extends StatelessWidget {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
   TextEditingController();
-  final TextEditingController _favoriteFoodController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +37,6 @@ class SignUpScreen extends StatelessWidget {
             emailController: _emailController,
             passwordController: _passwordController,
             confirmPasswordController: _confirmPasswordController,
-            favoriteFoodController: _favoriteFoodController,
           ),
         ),
       ),
@@ -54,7 +52,6 @@ class SignUpForm extends StatelessWidget {
     required this.emailController,
     required this.passwordController,
     required this.confirmPasswordController,
-    required this.favoriteFoodController,
   });
 
   final TextEditingController nameController;
@@ -62,7 +59,6 @@ class SignUpForm extends StatelessWidget {
   final TextEditingController emailController;
   final TextEditingController passwordController;
   final TextEditingController confirmPasswordController;
-  final TextEditingController favoriteFoodController;
 
   @override
   Widget build(BuildContext context) {
@@ -130,13 +126,6 @@ class SignUpForm extends StatelessWidget {
                 ),
                 obscureText: true,
               ),
-              TextField(
-                controller: favoriteFoodController,
-                decoration: const InputDecoration(
-                  labelText: '가장 좋아하는 음식',
-                  hintText: HintText.favoriteFood,
-                ),
-              ),
             ],
           ),
         ),
@@ -169,7 +158,6 @@ class SignUpForm extends StatelessWidget {
     String email = emailController.text.trim();
     String password = passwordController.text.trim();
     String confirmPassword = confirmPasswordController.text.trim();
-    String favoriteFood = favoriteFoodController.text.trim();
 
     // 이름 입력 확인
     if (name.isEmpty) {
@@ -201,12 +189,6 @@ class SignUpForm extends StatelessWidget {
       return;
     }
 
-    // 가장 좋아하는 음식 입력 확인
-    if (favoriteFood.isEmpty) {
-      showErrorDialog(context, HintText.favoriteFood);
-      return;
-    }
-
     // Firebase Auth를 사용하여 사용자 등록
     try {
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -219,7 +201,6 @@ class SignUpForm extends StatelessWidget {
         'name': name,
         'phone': phone,
         'email': email,
-        'favoriteFood': favoriteFood,
       });
 
       // 회원가입 성공
