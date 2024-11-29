@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import '../constants.dart'; // constants.dart 파일 import
+import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore import
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _contactController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _favoriteFoodController = TextEditingController();
 
   // ValueNotifiers
   final ValueNotifier<String> _usernameNotifier = ValueNotifier('');
@@ -15,13 +16,13 @@ class ForgotPasswordScreen extends StatelessWidget {
   final ValueNotifier<String> _passwordErrorNotifier =
   ValueNotifier('');
 
-  ForgotPasswordScreen({super.key}); // 비밀번호 찾기 오류
+  ForgotPasswordScreen({super.key}); // 비밀번호 재설정 오류
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('아이디&비밀번호 찾기'),
+        title: const Text('아이디&비밀번호 재설정'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -101,7 +102,7 @@ class ForgotPasswordScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            // 비밀번호 찾기 박스
+            // 비밀번호 재설정 박스
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
@@ -122,14 +123,11 @@ class ForgotPasswordScreen extends StatelessWidget {
                     controller: _usernameController,
                     decoration: const InputDecoration(labelText: '아이디'),
                   ),
-                  TextField(
-                    controller: _favoriteFoodController,
-                    decoration: const InputDecoration(labelText: '가장 좋아하는 음식'),
-                  ),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
-                      _findPassword(context);
+                      String email = _usernameController.text.trim(); // 입력된 이메일 가져오기
+                      _resetPassword(context, email); // 이메일을 인자로 전달
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppConstants.primaryColor, // 버튼 배경색
@@ -139,7 +137,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                       ),
                     ),
                     child: const Text(
-                      '비밀번호 찾기',
+                      '비밀번호 재설정',
                       style: TextStyle(
                           color: AppConstants.buttonTextColor), // 버튼 텍스트 색상
                     ),
@@ -149,7 +147,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                     valueListenable: _passwordNotifier,
                     builder: (context, password, child) {
                       return password.isNotEmpty
-                          ? Text('비밀번호: $password',
+                          ? Text('비밀번호 재설정 메시지: $password',
                           style: AppConstants.successMessageStyle)
                           : Container();
                     },
@@ -172,9 +170,9 @@ class ForgotPasswordScreen extends StatelessWidget {
   }
 
   // 아이디 찾기 함수
-  void _findUsername(BuildContext context) {
-    String name = _nameController.text;
-    String contact = _contactController.text;
+  void _findUsername(BuildContext context) async {
+    String name = _nameController.text.trim();
+    String contact = _contactController.text.trim();
 
     // 이름과 연락처 형식 검사
     if (name.isEmpty || !RegExp(r'^(010-\d{4}-\d{4})$').hasMatch(contact)) {
@@ -183,10 +181,18 @@ class ForgotPasswordScreen extends StatelessWidget {
       return;
     }
 
-    // 사용자 정보와 일치하는지 검사
-    if (name == UserInfo.userName && contact == UserInfo.userContact) {
-      // 아이디 찾기 로직 (예: 서버에서 아이디 조회)
-      _usernameNotifier.value = UserInfo.validID;
+    // Firestore에서 사용자 정보 조회
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('name', isEqualTo: name)
+        .where('phone', isEqualTo: contact)
+        .get();
+
+    // 사용자 정보가 일치하는지 확인
+    if (querySnapshot.docs.isNotEmpty) {
+      // 아이디 찾기 로직 (예: 사용자 문서에서 아이디 가져오기)
+      String userId = querySnapshot.docs.first['email']; // 이메일을 아이디로 가정
+      _usernameNotifier.value = userId;
       _usernameErrorNotifier.value = ''; // 오류 메시지 초기화
     } else {
       _usernameErrorNotifier.value = '이름/연락처가 일치하지 않습니다.'; // 오류 메시지
@@ -194,27 +200,19 @@ class ForgotPasswordScreen extends StatelessWidget {
     }
   }
 
-  // 비밀번호 찾기 함수
-  void _findPassword(BuildContext context) {
-    String username = _usernameController.text;
-    String favoriteFood = _favoriteFoodController.text;
-
-    // 아이디와 좋아하는 음식 형식 검사
-    if (username.isEmpty || favoriteFood.isEmpty) {
-      _passwordErrorNotifier.value = '아이디/답변 오류'; // 비밀번호 찾기 오류 메시지
-      _passwordNotifier.value = '';
+  // 비밀번호 재설정 함수
+  Future<void> _resetPassword(BuildContext context, String email) async {
+    if (email.isEmpty) {
+      _passwordErrorNotifier.value = '이메일을 입력하세요.'; // 오류 메시지
       return;
     }
 
-    // 사용자 정보와 일치하는지 검사
-    if (username == UserInfo.validID &&
-        favoriteFood == UserInfo.favoriteFood) {
-      // 비밀번호 찾기 로직 (예: 서버에서 비밀번호 조회)
-      _passwordNotifier.value = UserInfo.validPassword;
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      _passwordNotifier.value = '비밀번호 재설정 이메일이 전송되었습니다.';
       _passwordErrorNotifier.value = ''; // 오류 메시지 초기화
-    } else {
-      _passwordErrorNotifier.value = '아이디/답변이 일치하지 않습니다.'; // 오류 메시지
-      _passwordNotifier.value = '';
+    } on FirebaseAuthException catch (e) {
+      _passwordErrorNotifier.value = '오류 발생: ${e.message}'; // 오류 메시지
     }
   }
 }
