@@ -39,7 +39,8 @@ dependencies:
   video_player: ^2.5.3
   firebase_core: ^3.8.0
   firebase_auth: ^5.3.3
-  cloud_firestore: ^5.5.0  # Firestore 패키지 추가
+  cloud_firestore: ^5.5.0
+  flutter_dotenv: ^5.2.1
 
 dev_dependencies:
   flutter_test:
@@ -59,7 +60,7 @@ dev_dependencies:
 flutter:
   assets:
     - assets/images/
-
+    - .env
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
