@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'routes.dart'; // routes.dart 파일 import
-/* todo Firebase
+// todo Firebase
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-*/
 
-void main() {
-  runApp(const MyApp());
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Flutter 엔진 초기화
+  await Firebase.initializeApp( // Firebase 초기화
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(const MyApp()); // 애플리케이션 실행
 }
 
 class MyApp extends StatelessWidget {

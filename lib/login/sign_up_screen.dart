@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Firebase Auth import
+import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore import
 import '../constants.dart'; // constants.dart 파일 import
 import '../show_dialog.dart';
 import '../routes.dart'; // routes.dart 파일 import
+
 class SignUpScreen extends StatelessWidget {
   SignUpScreen({super.key});
 
@@ -160,7 +163,7 @@ class SignUpForm extends StatelessWidget {
     );
   }
 
-  void _signUp(BuildContext context) {
+  void _signUp(BuildContext context) async {
     String name = nameController.text.trim();
     String phone = phoneController.text.trim();
     String email = emailController.text.trim();
@@ -170,46 +173,69 @@ class SignUpForm extends StatelessWidget {
 
     // 이름 입력 확인
     if (name.isEmpty) {
-      showErrorDialog(context, HintText.name); // 수정된 부분
+      showErrorDialog(context, HintText.name);
       return;
     }
 
     // 전화번호 형식 검사
     RegExp phoneRegExp = RegExp(r'^(010-\d{4}-\d{4})$');
-    // 이메일 형식 검사
-    RegExp emailRegExp =
-    RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-
     if (!phoneRegExp.hasMatch(phone)) {
-      showErrorDialog(context, HintText.phone); // 수정된 부분
+      showErrorDialog(context, HintText.phone);
       return;
     }
 
+    // 이메일 형식 검사
+    RegExp emailRegExp = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     if (!emailRegExp.hasMatch(email)) {
-      showErrorDialog(context, HintText.email); // 수정된 부분
+      showErrorDialog(context, HintText.email);
       return;
     }
 
     if (password.isEmpty || confirmPassword.isEmpty) {
-      showErrorDialog(context, HintText.password); // 수정된 부분
+      showErrorDialog(context, HintText.password);
       return;
     }
 
     if (password != confirmPassword) {
-      showErrorDialog(context, HintText.confirmPassword); // 수정된 부분
+      showErrorDialog(context, HintText.confirmPassword);
       return;
     }
 
     // 가장 좋아하는 음식 입력 확인
     if (favoriteFood.isEmpty) {
-      showErrorDialog(context, HintText.favoriteFood); // 수정된 부분
+      showErrorDialog(context, HintText.favoriteFood);
       return;
     }
 
-    // 성공적으로 회원가입이 완료된 경우
-    showSuccessDialog(context, '회원가입이 완료되었습니다!', () {
-      // 사용자가 확인 버튼을 클릭했을 때 로그인 화면으로 이동
-      Navigator.pushReplacementNamed(context, AppRoutes.login);
-    });
+    // Firebase Auth를 사용하여 사용자 등록
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // Firestore에 사용자 정보 저장
+      await FirebaseFirestore.instance.collection('users').doc(userCredential.user?.uid).set({
+        'name': name,
+        'phone': phone,
+        'email': email,
+        'favoriteFood': favoriteFood,
+      });
+
+      // 회원가입 성공
+      showSuccessDialog(context, '회원가입이 완료되었습니다!', () {
+        // 사용자가 확인 버튼을 클릭했을 때 로그인 화면으로 이동
+        Navigator.pushReplacementNamed(context, AppRoutes.login);
+      });
+    } on FirebaseAuthException catch (e) {
+      // Firebase Auth에서 발생하는 예외 처리
+      if (e.code == 'weak-password') {
+        showErrorDialog(context, '비밀번호가 너무 약합니다.');
+      } else if (e.code == 'email-already-in-use') {
+        showErrorDialog(context, '이미 사용 중인 이메일입니다.');
+      } else {
+        showErrorDialog(context, '회원가입 중 오류가 발생했습니다: ${e.message}');
+      }
+    }
   }
 }

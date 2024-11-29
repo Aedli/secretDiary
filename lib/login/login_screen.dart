@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../constants.dart'; // constants.dart 파일 import
 import '../show_dialog.dart'; // show_dialog.dart 파일 import
 import '../routes.dart'; // routes.dart 파일 import
+import 'package:firebase_auth/firebase_auth.dart'; // Firebase Auth import
+import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore import
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -21,12 +23,14 @@ class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
 
   @override
-  _LoginFormState createState() => _LoginFormState();
+  LoginFormState createState() => LoginFormState();
 }
 
-class _LoginFormState extends State<LoginForm> {
+class LoginFormState extends State<LoginForm> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance; // FirebaseAuth 인스턴스 생성
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance; // Firestore 인스턴스 생성
 
   @override
   Widget build(BuildContext context) {
@@ -115,18 +119,37 @@ class _LoginFormState extends State<LoginForm> {
     );
   }
 
-  void _signIn(BuildContext context) {
-    String email = _emailController.text;
-    String password = _passwordController.text;
+  void _signIn(BuildContext context) async {
+    String email = _emailController.text.trim();
+    String password = _passwordController.text.trim();
 
-    // 이메일과 비밀번호가 각각 상수와 일치할 때 로그인 성공
-    if (email == UserInfo.validID && password == UserInfo.validPassword) {
-      showSuccessDialog(context, Message.loginSuccessMessage, () {
-        // 성공적으로 로그인 후 AccountPage로 이동
-        Navigator.pushReplacementNamed(context, AppRoutes.tapPage); // 라우트를 사용하여 AccountPage로 이동
-      });
-    } else {
-      showErrorDialog(context, Message.loginErrorMessage); // context 전달
+    try {
+      // Firebase Auth를 통한 로그인 시도
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // Firestore에서 사용자 이름 가져오기
+      DocumentSnapshot userDoc = await _firestore.collection('users').doc(userCredential.user?.uid).get();
+
+      if (userDoc.exists) {
+        String userName = userDoc['name']; // Firestore에서 이름 가져오기
+        showSuccessDialog(context, '$userName님 반갑습니다!', () {
+          Navigator.pushReplacementNamed(context, AppRoutes.tapPage); // TapPage로 이동
+        });
+      } else {
+        showErrorDialog(context, '사용자 정보를 찾을 수 없습니다.');
+      }
+    } on FirebaseAuthException catch (e) {
+      // 로그인 실패 시 에러 처리
+      if (e.code == 'user-not-found') {
+        showErrorDialog(context, '존재하지 않는 계정입니다.'); // context 전달
+      } else if (e.code == 'wrong-password') {
+        showErrorDialog(context, '비밀번호가 잘못되었습니다.');
+      } else {
+        showErrorDialog(context, '로그인 중 오류가 발생했습니다.');
+      }
     }
   }
 
