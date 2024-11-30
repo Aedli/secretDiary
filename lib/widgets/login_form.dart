@@ -1,23 +1,8 @@
 import 'package:flutter/material.dart';
-import '../constants.dart'; // constants.dart 파일 import
-import '../show_dialog.dart'; // show_dialog.dart 파일 import
-import '../routes.dart'; // routes.dart 파일 import
-import 'package:firebase_auth/firebase_auth.dart'; // Firebase Auth import
-import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore import
-
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('로그인')),
-      body: const Center(
-        child: LoginForm(),
-      ),
-    );
-  }
-}
+import '../constants.dart'; // constants.dart 파일 임포트
+import '../show_dialog.dart'; // show_dialog.dart 파일 임포트
+import '../routes.dart'; // routes.dart 파일 임포트
+import '../models/user_model.dart'; // UserModel 임포트
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -29,8 +14,7 @@ class LoginForm extends StatefulWidget {
 class LoginFormState extends State<LoginForm> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance; // FirebaseAuth 인스턴스 생성
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance; // Firestore 인스턴스 생성
+  final UserModel _userModel = UserModel(); // UserModel 인스턴스 생성
 
   @override
   Widget build(BuildContext context) {
@@ -82,14 +66,12 @@ class LoginFormState extends State<LoginForm> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppConstants.primaryColor, // 버튼 색상
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                            AppConstants.borderRadius), // 모서리 둥글게 설정
+                        borderRadius: BorderRadius.circular(AppConstants.borderRadius), // 모서리 둥글게 설정
                       ),
                     ),
                     child: const Text(
                       '로그인',
-                      style: TextStyle(
-                          color: AppConstants.buttonTextColor), // 버튼 텍스트 색상
+                      style: TextStyle(color: AppConstants.buttonTextColor), // 버튼 텍스트 색상
                     ),
                   ),
                 ),
@@ -123,33 +105,22 @@ class LoginFormState extends State<LoginForm> {
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
 
-    try {
-      // Firebase Auth를 통한 로그인 시도
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+    // UserModel을 사용하여 로그인 시도
+    final userCredential = await _userModel.signIn(email, password);
 
+    if (userCredential != null) {
       // Firestore에서 사용자 이름 가져오기
-      DocumentSnapshot userDoc = await _firestore.collection('users').doc(userCredential.user?.uid).get();
+      String? userName = await _userModel.getUserName(userCredential.user?.uid ?? '');
 
-      if (userDoc.exists) {
-        String userName = userDoc['name']; // Firestore에서 이름 가져오기
+      if (userName != null) {
         showSuccessDialog(context, '$userName님 반갑습니다!', () {
           Navigator.pushReplacementNamed(context, AppRoutes.tapPage); // TapPage로 이동
         });
       } else {
         showErrorDialog(context, '사용자 정보를 찾을 수 없습니다.');
       }
-    } on FirebaseAuthException catch (e) {
-      // 로그인 실패 시 에러 처리
-      if (e.code == 'user-not-found') {
-        showErrorDialog(context, '존재하지 않는 계정입니다.'); // context 전달
-      } else if (e.code == 'wrong-password') {
-        showErrorDialog(context, '비밀번호가 잘못되었습니다.');
-      } else {
-        showErrorDialog(context, '로그인 중 오류가 발생했습니다.');
-      }
+    } else {
+      showErrorDialog(context, '로그인 중 오류가 발생했습니다.'); // 로그인 실패 시 에러 처리
     }
   }
 
