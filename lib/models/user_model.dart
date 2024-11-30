@@ -2,15 +2,61 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class UserModel {
-  final String name;
-  final String contact;
+  final FirebaseAuth _auth = FirebaseAuth.instance; // FirebaseAuth 인스턴스 생성
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance; // Firestore 인스턴스 생성
 
-  UserModel({required this.name, required this.contact});
+  // 사용자 등록 함수
+  Future<UserCredential?> signUp(String email, String password, String name, String phone) async {
+    try {
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-  // 아이디 찾기 함수
-  Future<String?> findUsername() async {
+      // Firestore에 사용자 정보 저장
+      await _firestore.collection('users').doc(userCredential.user?.uid).set({
+        'name': name,
+        'phone': phone,
+        'email': email,
+      });
+      return userCredential; // 사용자 정보 반환
+    } on FirebaseAuthException catch (e) {
+      // 예외 처리
+      print('회원가입 오류: ${e.message}');
+      return null;
+    }
+  }
+
+
+
+  // 로그인 함수
+  Future<UserCredential?> signIn(String email, String password) async {
+    try {
+      // Firebase Auth를 통한 로그인 시도
+      return await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+    } on FirebaseAuthException catch (e) {
+      // 로그인 실패 시 예외 처리
+      print('로그인 오류: ${e.message}');
+      return null; // 로그인 실패 시 null 반환
+    }
+  }
+
+  // Firestore에서 사용자 이름 가져오기
+  Future<String?> getUserName(String userId) async {
+    DocumentSnapshot userDoc = await _firestore.collection('users').doc(userId).get();
+    if (userDoc.exists) {
+      return userDoc['name']; // Firestore에서 이름 가져오기
+    }
+    return null; // 사용자 정보가 없을 경우 null 반환
+  }
+
+  // 아이디 찾기 함수 (name과 contact을 매개변수로 받음)
+  Future<String?> findUsername(String name, String contact) async {
     // Firestore에서 사용자 정보 조회
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+    QuerySnapshot querySnapshot = await _firestore
         .collection('users')
         .where('name', isEqualTo: name)
         .where('phone', isEqualTo: contact)

@@ -70,8 +70,8 @@ class ForgotPasswordScreen extends StatelessWidget {
     }
 
     // UserModel을 사용하여 아이디 찾기
-    UserModel userModel = UserModel(name: name, contact: contact);
-    String? userId = await userModel.findUsername();
+    UserModel userModel = UserModel(); // UserModel 인스턴스 생성
+    String? userId = await userModel.findUsername(name, contact); // name과 contact을 매개변수로 전달
 
     if (userId != null) {
       _usernameNotifier.value = userId; // 아이디 업데이트
