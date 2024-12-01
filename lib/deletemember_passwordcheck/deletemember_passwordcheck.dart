@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mypage/deletefinish/deletefinish.dart';
 
 class PasswordCheck extends StatefulWidget {
@@ -13,6 +14,7 @@ class PasswordCheck extends StatefulWidget {
 class _PasswordCheckState extends State<PasswordCheck> {
   final _passwordController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance; // Firestore 인스턴스 생성
 
   // 비밀번호 확인 및 계정 삭제 함수
   Future<void> _deleteAccount() async {
@@ -32,6 +34,9 @@ class _PasswordCheckState extends State<PasswordCheck> {
         password: password,
       );
       await user.reauthenticateWithCredential(credential);
+
+      // Firestore에서 사용자 정보 삭제
+      await _firestore.collection('users').doc(user.uid).delete();
 
       // 계정 삭제
       await user.delete();
@@ -116,7 +121,6 @@ class _PasswordCheckState extends State<PasswordCheck> {
                 obscureText: true,
               ),
               SizedBox(height: 20),
-
               SizedBox(height: 40),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
