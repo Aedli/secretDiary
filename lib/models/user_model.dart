@@ -13,6 +13,8 @@ class UserModel {
         password: password,
       );
 
+      await userCredential.user?.updateProfile(displayName: name);  // displayName을 name으로 설정
+
       // Firestore에 사용자 정보 저장
       await _firestore.collection('users').doc(userCredential.user?.uid).set({
         'name': name,

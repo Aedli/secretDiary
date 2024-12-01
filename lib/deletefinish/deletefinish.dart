@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mypage/deletemember_passwordcheck/deletemember_passwordcheck.dart';
+import 'package:mypage/screens/login_screen.dart';
 
 class DeleteFinish extends StatelessWidget {
   DeleteFinish({super.key});
@@ -58,7 +59,11 @@ class DeleteFinish extends StatelessWidget {
                     foregroundColor: Colors.white, backgroundColor: Colors.blue, // 버튼 텍스트 색 변경
                   ),
                   onPressed: () {
-                    Navigator.pop(context);
+                    // 확인 버튼 클릭 시 LoginScreen으로 이동
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginScreen()), // LoginScreen 페이지로 이동
+                    );
                   },
                   child: Text('확인'),
                 ),
