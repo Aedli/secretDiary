@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mypage/deletemember_passwordcheck/deletemember_passwordcheck.dart';
 import 'package:mypage/screens/login_screen.dart';
 
 class DeleteFinish extends StatelessWidget {
