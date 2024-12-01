@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 //login
-import 'login/login_screen.dart';
-import 'login/forgot_password_screen.dart';
-import 'login/sign_up_screen.dart';
+import 'screens/login_screen.dart';
+import 'screens/forgot_password_screen.dart';
+import 'screens/sign_up_screen.dart';
 //accountpage
 import 'accountpage/account_page.dart';
 import 'tappage/tapPage.dart';
