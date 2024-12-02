@@ -1,43 +1,86 @@
 import 'package:flutter/material.dart';
-import 'package:mypage/diarywritepage/diary_write_page.dart';
+import 'package:mypage/diarywritepage/diary_write_page.dart'; // DiaryWritePage 임포트
+import 'dart:io';
+import 'package:video_player/video_player.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 class DiarySave extends StatelessWidget {
   final String title;
   final String body;
-
-  const DiarySave({Key? key, required this.title, required this.body})
+  final File? file;
+  const DiarySave({Key? key, required this.title, required this.body, required this.file})
       : super(key: key);
+
+  Future<void> _deleteDiary(BuildContext context) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+
+      if (user == null) {
+        throw Exception('사용자가 로그인되어 있지 않습니다.');
+      }
+
+      final diaryId = title.replaceAll(' ', '_'); // Firestore에서 ID로 사용했던 title 기반 ID
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('diarys')
+          .doc(diaryId)
+          .delete();
+
+      // 삭제 성공 메시지
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('다이어리가 삭제되었습니다.'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      Navigator.pop(context); // 메인 화면으로 이동
+    } catch (e) {
+      // 에러 발생 시
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('삭제 중 오류가 발생했습니다: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   void _showDeleteDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("삭제 확인"),
-          content: Text("정말로 삭제하시겠습니까?"),
+          title: const Text("삭제 확인"),
+          content: const Text("정말로 삭제하시겠습니까?"),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context); // 다이얼로그 닫기
               },
-              child: Text("취소"),
+              child: const Text("취소"),
             ),
             TextButton(
               onPressed: () {
                 Navigator.pop(context); // 다이얼로그 닫기
-                Navigator.pop(context); // 메인 화면으로 이동
+                _deleteDiary(context); // 다이어리 삭제 함수 호출
               },
-              child: Text("확인"),
+              child: const Text("확인"),
             ),
           ],
         );
       },
     );
   }
-  @override
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('저장 완료'),
+        title: const Text('저장 완료'),
         backgroundColor: Colors.teal,
       ),
       body: Padding(
@@ -45,33 +88,44 @@ class DiarySave extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Text(
-            //   '저장된 제목:',
-            //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            // ),
-            //SizedBox(height: 8),
-            Text(title, style: TextStyle(fontWeight: FontWeight.bold,
-                fontSize: 25)),
-            SizedBox(height: 16),
-            Image.asset(
-              'assets/images/test1.jpg',
-              height: 200,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-            SizedBox(height: 16),
-            // Text(
-            //   '저장된 내용:',
-            //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            // ),
-            SizedBox(height: 8),
+            Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 25)),
+            const SizedBox(height: 16),
+            // 파일이 없거나 오류가 나면 기본 이미지 표시
+            if (file != null)
+              file!.path.endsWith('.mp4')
+                  ? AspectRatio(
+                aspectRatio: 6 / 6,
+                child: VideoPlayer(VideoPlayerController.file(file!)..initialize().then((_) {})),
+              )
+                  : Image.file(
+                file!,
+                height: 200,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                // 파일 로딩 실패 시 기본 이미지 사용
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    'assets/images/test1.jpg',
+                    height: 200,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  );
+                },
+              )
+            else
+              Image.asset(
+                'assets/images/test1.jpg', // 기본 이미지
+                height: 200,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+            const SizedBox(height: 16),
             Expanded(
               child: SingleChildScrollView(
-                child: Text(body, style: TextStyle(fontSize: 16)),
+                child: Text(body, style: const TextStyle(fontSize: 16)),
               ),
             ),
-            SizedBox(height: 16),
-
+            const SizedBox(height: 16),
             // 수정 및 삭제 버튼
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -84,11 +138,12 @@ class DiarySave extends StatelessWidget {
                         builder: (context) => DiaryWritePage(
                           initialTitle: title,
                           initialBody: body,
+                          initialFile: file,
                         ),
                       ),
                     );
                   },
-                  child: Text('수정'),
+                  child: const Text('수정'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.teal,
                   ),
@@ -97,7 +152,7 @@ class DiarySave extends StatelessWidget {
                   onPressed: () {
                     _showDeleteDialog(context); // 삭제 다이얼로그 호출
                   },
-                  child: Text('삭제'),
+                  child: const Text('삭제'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
                   ),
