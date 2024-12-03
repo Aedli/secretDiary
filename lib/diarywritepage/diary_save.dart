@@ -88,41 +88,25 @@ class DiarySave extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 25)),
-            const SizedBox(height: 16),
-            // 파일이 없거나 오류가 나면 기본 이미지 표시
+            Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25)),
+            SizedBox(height: 16),
             if (file != null)
               file!.path.endsWith('.mp4')
                   ? AspectRatio(
-                aspectRatio: 6 / 6,
-                child: VideoPlayer(VideoPlayerController.file(file!)..initialize().then((_) {})),
+                aspectRatio:  6/6,
+                child: VideoPlayer(VideoPlayerController.file(file!)
+                  ..initialize().then((_) {})),
               )
                   : Image.file(
                 file!,
                 height: 200,
                 width: double.infinity,
                 fit: BoxFit.cover,
-                // 파일 로딩 실패 시 기본 이미지 사용
-                errorBuilder: (context, error, stackTrace) {
-                  return Image.asset(
-                    'assets/images/test1.jpg',
-                    height: 200,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  );
-                },
-              )
-            else
-              Image.asset(
-                'assets/images/test1.jpg', // 기본 이미지
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
               ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Expanded(
               child: SingleChildScrollView(
-                child: Text(body, style: const TextStyle(fontSize: 16)),
+                child: Text(body, style: TextStyle(fontSize: 16)),
               ),
             ),
             const SizedBox(height: 16),

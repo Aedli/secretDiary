@@ -131,9 +131,9 @@ class _DiaryWritePageState extends State<DiaryWritePage> {
 
       _titleController.clear();
       _bodyController.clear();
-      setState(() {
-        _file = null;
-      });
+      // setState(() {
+      //   _file = null;
+      // });
 
       Navigator.push(
         context,

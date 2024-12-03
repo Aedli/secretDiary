@@ -21,35 +21,35 @@ class CreateModel {
     }
     return File(video.path);
   }
-  /// Firebase Storage에 이미지를 업로드하는 함수
-  Future<String> uploadImage(File imageFile) async {
-    try {
-      final String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-      final Reference ref = _storage.ref().child('images/$fileName.jpg');
-
-      final UploadTask uploadTask = ref.putFile(imageFile);
-      final TaskSnapshot snapshot = await uploadTask;
-
-      // 업로드된 파일의 다운로드 URL 반환
-      return await snapshot.ref.getDownloadURL();
-    } catch (e) {
-      throw Exception('이미지 업로드에 실패했습니다: $e');
-    }
-  }
-
-  /// Firebase Storage에 비디오를 업로드하는 함수
-  Future<String> uploadVideo(File videoFile) async {
-    try {
-      final String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-      final Reference ref = _storage.ref().child('videos/$fileName.mp4');
-
-      final UploadTask uploadTask = ref.putFile(videoFile);
-      final TaskSnapshot snapshot = await uploadTask;
-
-      // 업로드된 파일의 다운로드 URL 반환
-      return await snapshot.ref.getDownloadURL();
-    } catch (e) {
-      throw Exception('비디오 업로드에 실패했습니다: $e');
-    }
-  }
+  // /// Firebase Storage에 이미지를 업로드하는 함수
+  // Future<String> uploadImage(File imageFile) async {
+  //   try {
+  //     final String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+  //     final Reference ref = _storage.ref().child('images/$fileName.jpg');
+  //
+  //     final UploadTask uploadTask = ref.putFile(imageFile);
+  //     final TaskSnapshot snapshot = await uploadTask;
+  //
+  //     // 업로드된 파일의 다운로드 URL 반환
+  //     return await snapshot.ref.getDownloadURL();
+  //   } catch (e) {
+  //     throw Exception('이미지 업로드에 실패했습니다: $e');
+  //   }
+  // }
+  //
+  // /// Firebase Storage에 비디오를 업로드하는 함수
+  // Future<String> uploadVideo(File videoFile) async {
+  //   try {
+  //     final String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+  //     final Reference ref = _storage.ref().child('videos/$fileName.mp4');
+  //
+  //     final UploadTask uploadTask = ref.putFile(videoFile);
+  //     final TaskSnapshot snapshot = await uploadTask;
+  //
+  //     // 업로드된 파일의 다운로드 URL 반환
+  //     return await snapshot.ref.getDownloadURL();
+  //   } catch (e) {
+  //     throw Exception('비디오 업로드에 실패했습니다: $e');
+  //   }
+  // }
 }
