@@ -84,29 +84,16 @@ class _DiaryWritePageState extends State<DiaryWritePage> {
       String diaryId = title.replaceAll(' ', '_'); // 제목 기반 ID 생성
 
       // Firebase Storage 참조 생성
-      String? imageUrl;
-      if (_file != null && !_file!.path.endsWith('.mp4')) {
+      String? fileUrl;
+      if (_file != null) {
         final storageRef = FirebaseStorage.instance
             .ref()
-            .child('users/$userId/diarys/$diaryId/image_${DateTime.now().millisecondsSinceEpoch}.jpg');
+            .child('users/$userId/diarys/$diaryId/${DateTime.now().millisecondsSinceEpoch}${_file!.path.endsWith('.mp4') ? ".mp4" : ".jpg"}');
 
-        // 이미지가 이미 업로드되었는지 확인
-        final existingDoc = await _firestore
-            .collection('users')
-            .doc(userId)
-            .collection('diarys')
-            .doc(diaryId)
-            .get();
-
-        if (!existingDoc.exists || existingDoc['filePath'] == null) {
-          // 파일 업로드
-          UploadTask uploadTask = storageRef.putFile(_file!);
-          final snapshot = await uploadTask.whenComplete(() {});
-          imageUrl = await snapshot.ref.getDownloadURL();
-        } else {
-          // 기존 이미지 URL 사용
-          imageUrl = existingDoc['filePath'];
-        }
+        // 파일 업로드
+        UploadTask uploadTask = storageRef.putFile(_file!);
+        final snapshot = await uploadTask.whenComplete(() {});
+        fileUrl = await snapshot.ref.getDownloadURL();
       }
 
       // Firestore에 다이어리 저장
@@ -118,7 +105,8 @@ class _DiaryWritePageState extends State<DiaryWritePage> {
           .set({
         'title': title,
         'content': body,
-        'filePath': imageUrl,
+        'filePath': fileUrl,
+        'isVideo': _file != null && _file!.path.endsWith('.mp4'), // 동영상 여부 저장
         'updatedAt': Timestamp.now(),
       });
 
@@ -131,10 +119,6 @@ class _DiaryWritePageState extends State<DiaryWritePage> {
 
       _titleController.clear();
       _bodyController.clear();
-      // setState(() {
-      //   _file = null;
-      // });
-
       Navigator.push(
         context,
         MaterialPageRoute(
