@@ -41,6 +41,7 @@ dependencies:
   firebase_auth: ^5.3.3
   cloud_firestore: ^5.5.0
   flutter_dotenv: ^5.2.1
+  firebase_storage: ^12.3.6
 
 dev_dependencies:
   flutter_test:

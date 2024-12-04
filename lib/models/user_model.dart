@@ -21,6 +21,7 @@ class UserModel {
         'phone': phone,
         'email': email,
       });
+
       return userCredential; // 사용자 정보 반환
     } on FirebaseAuthException catch (e) {
       // 예외 처리
@@ -28,8 +29,6 @@ class UserModel {
       return null;
     }
   }
-
-
 
   // 로그인 함수
   Future<UserCredential?> signIn(String email, String password) async {
@@ -55,28 +54,74 @@ class UserModel {
     return null; // 사용자 정보가 없을 경우 null 반환
   }
 
-  // 아이디 찾기 함수 (name과 contact을 매개변수로 받음)
+  // 아이디 찾기 함수
   Future<String?> findUsername(String name, String contact) async {
-    // Firestore에서 사용자 정보 조회
     QuerySnapshot querySnapshot = await _firestore
         .collection('users')
         .where('name', isEqualTo: name)
         .where('phone', isEqualTo: contact)
         .get();
 
-    // 사용자 정보가 일치하는지 확인
     if (querySnapshot.docs.isNotEmpty) {
-      return querySnapshot.docs.first['email']; // 이메일을 아이디로 가정
+      return querySnapshot.docs.first['email'];
     }
-    return null; // 일치하는 사용자가 없을 경우 null 반환
+    return null;
   }
 
   // 비밀번호 재설정 함수
   static Future<void> resetPassword(String email) async {
     if (email.isEmpty) {
-      throw Exception('이메일을 입력하세요.'); // 오류 메시지
+      throw Exception('이메일을 입력하세요.');
     }
-
     await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+  }
+
+  // 다이어리 추가 함수
+  Future<void> addDiary(String userId, String title, String content) async {
+    await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('diarys')
+        .doc()
+        .set({
+      'title': title,
+      'content': content,
+      'createdAt': Timestamp.now(),
+    });
+  }
+
+  // 사용자의 다이어리 목록 가져오기
+  Future<List<Map<String, dynamic>>> getDiaries(String userId) async {
+    QuerySnapshot diarySnapshot = await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('diarys')
+        .orderBy('createdAt', descending: true)
+        .get();
+
+    return diarySnapshot.docs.map((doc) {
+      return {
+        'id': doc.id,
+        'title': doc['title'],
+        'content': doc['content'],
+        'imageUrl': doc['imageUrl'],
+        'createdAt': doc['createdAt'],
+      };
+    }).toList();
+  }
+
+  // 특정 다이어리 삭제
+  Future<void> deleteDiary(String userId, String diaryId) async {
+    await _firestore.collection('users').doc(userId).collection('diarys').doc(diaryId).delete();
+  }
+
+  // 다이어리 업데이트
+  Future<void> updateDiary(String userId, String diaryId, String title, String content, String imageUrl) async {
+    await _firestore.collection('users').doc(userId).collection('diarys').doc(diaryId).update({
+      'title': title,
+      'content': content,
+      'imageUrl': imageUrl,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
   }
 }

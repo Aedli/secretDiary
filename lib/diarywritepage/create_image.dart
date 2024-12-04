@@ -1,9 +1,7 @@
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-
 class CreateModel {
   final _picker = ImagePicker();
-
   // 사진 선택
   Future<File?> getImage() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -21,4 +19,5 @@ class CreateModel {
     }
     return File(video.path);
   }
+
 }
