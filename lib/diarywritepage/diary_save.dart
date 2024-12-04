@@ -103,7 +103,9 @@ class DiarySave extends StatelessWidget {
                   ? AspectRatio(
                 aspectRatio:  6/6,
                 child: VideoPlayer(VideoPlayerController.file(file!)
-                  ..initialize().then((_) {})),
+                  ..initialize()
+                  ..setLooping(true)
+                  ..play().then((_) {}))
               )
                   : Image.file(
                 file!,
@@ -116,7 +118,9 @@ class DiarySave extends StatelessWidget {
                   ? AspectRatio(
                 aspectRatio: 6 / 6,
                 child: VideoPlayer(VideoPlayerController.networkUrl(Uri.parse(imageUrl!))
-                    ..initialize().then((_) {})),
+                  ..initialize()
+                  ..setLooping(true)
+                  ..play().then((_) {}))
               )
 
                   : Image.network(
@@ -124,7 +128,7 @@ class DiarySave extends StatelessWidget {
                 height: 200,
                 width: double.infinity,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {//실패시 test이미지 불러오기
+                errorBuilder: (context, error, stackTrace) {//실패시 기본이미지로
                   return Image.asset(
                     'assets/images/test1.jpg',
                     height: 200,

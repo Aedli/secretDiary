@@ -220,11 +220,7 @@ class _DiaryWritePageState extends State<DiaryWritePage> {
                   GestureDetector(
                     onTap: () {
                       setState(() {
-                        if (_videoController!.value.isPlaying) {
-                          _videoController!.pause();
-                        } else {
-                          _videoController!.play();
-                        }
+                        _videoController!.play();
                       });
                     },
                     child: Container(
