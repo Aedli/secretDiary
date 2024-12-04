@@ -54,10 +54,22 @@ class SignUpScreen extends StatelessWidget {
       return;
     }
 
+    // 전화번호 입력 확인
+    if (phone.isEmpty) {
+      showErrorDialog(context, '전화번호를 입력하세요.'); // 전화번호가 비어있을 때
+      return;
+    }
+
     // 전화번호 형식 검사
     RegExp phoneRegExp = RegExp(r'^(010-\d{4}-\d{4})$');
     if (!phoneRegExp.hasMatch(phone)) {
       showErrorDialog(context, '전화번호 형식이 올바르지 않습니다.');
+      return;
+    }
+
+    // 이메일 입력 확인
+    if (email.isEmpty) {
+      showErrorDialog(context, '이메일을 입력하세요.'); // 이메일이 비어있을 때
       return;
     }
 
@@ -68,11 +80,25 @@ class SignUpScreen extends StatelessWidget {
       return;
     }
 
-    if (password.isEmpty || confirmPassword.isEmpty) {
-      showErrorDialog(context, '비밀번호를 입력하세요.');
+    // 비밀번호 입력 확인
+    if (password.isEmpty) {
+      showErrorDialog(context, '비밀번호를 입력하세요.'); // 비밀번호가 비어있을 때
       return;
     }
 
+    // 비밀번호 형식 검사 (6자 이상)
+    if (password.length < 6) {
+      showErrorDialog(context, '비밀번호는 6자 이상이어야 합니다.'); // 길이 조건 검사
+      return;
+    }
+
+    // 비밀번호 확인 입력 확인
+    if (confirmPassword.isEmpty) {
+      showErrorDialog(context, '비밀번호 확인을 입력하세요.'); // 비밀번호 확인이 비어있을 때
+      return;
+    }
+
+    // 비밀번호와 비밀번호 확인 일치 확인
     if (password != confirmPassword) {
       showErrorDialog(context, '비밀번호가 일치하지 않습니다.');
       return;
