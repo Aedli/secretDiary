@@ -42,6 +42,7 @@ class GridDiary extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("일기 모음"),
+        automaticallyImplyLeading: false, // 화살표 뒤로가기 버튼 제거
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: _fetchDiaries(),

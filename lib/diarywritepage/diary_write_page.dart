@@ -199,6 +199,7 @@ class _DiaryWritePageState extends State<DiaryWritePage> {
       appBar: AppBar(
         title: Text('다이어리 작성'),
         backgroundColor: Colors.teal,
+        automaticallyImplyLeading: false, // 화살표 뒤로가기 버튼 제거
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

@@ -110,8 +110,8 @@ class DiarySave extends StatelessWidget {
                 height: 200,
                 width: double.infinity,
                 fit: BoxFit.cover,
-              ),
-            if (imageUrl != null)
+              )
+            else if (imageUrl != null)
               isVideo!=false
                   ? AspectRatio(
                 aspectRatio: 6 / 6,
@@ -124,9 +124,15 @@ class DiarySave extends StatelessWidget {
                 height: 200,
                 width: double.infinity,
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {//실패시 test이미지 불러오기
+                  return Image.asset(
+                    'assets/images/test1.jpg',
+                    height: 200,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  );
+                },
               ),
-
-
 
             SizedBox(height: 16),
             Expanded(
