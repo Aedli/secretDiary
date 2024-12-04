@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import '../constants.dart'; // constants.dart 파일 임포트
-import '../show_dialog.dart'; // show_dialog.dart 파일 임포트
-import '../routes.dart'; // routes.dart 파일 임포트
-import '../models/user_model.dart'; // UserModel 임포트
 
-class LoginForm extends StatefulWidget {
-  const LoginForm({super.key});
+class LoginForm extends StatelessWidget {
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
+  final Function(BuildContext) onSignIn; // 로그인 함수 콜백
+  final VoidCallback onNavigateToForgot; // 비밀번호 찾기 함수 콜백
+  final VoidCallback onNavigateToSignUp; // 회원가입 함수 콜백
 
-  @override
-  LoginFormState createState() => LoginFormState();
-}
-
-class LoginFormState extends State<LoginForm> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final UserModel _userModel = UserModel(); // UserModel 인스턴스 생성
+  const LoginForm({
+    super.key,
+    required this.emailController,
+    required this.passwordController,
+    required this.onSignIn,
+    required this.onNavigateToForgot,
+    required this.onNavigateToSignUp,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +39,7 @@ class LoginFormState extends State<LoginForm> {
           mainAxisSize: MainAxisSize.min, // 자식 요소에 맞춰 최소 크기로 설정
           children: [
             TextField(
-              controller: _emailController,
+              controller: emailController,
               decoration: const InputDecoration(
                 labelText: '이메일',
                 hintText: 'aaa@example.com',
@@ -48,7 +49,7 @@ class LoginFormState extends State<LoginForm> {
             ),
             const SizedBox(height: 16), // 입력 필드 간격
             TextField(
-              controller: _passwordController,
+              controller: passwordController,
               decoration: const InputDecoration(
                 labelText: '비밀번호',
                 labelStyle: AppConstants.labelTextStyle, // 레이블 텍스트 스타일
@@ -61,7 +62,7 @@ class LoginFormState extends State<LoginForm> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      _signIn(context); // context를 전달
+                      onSignIn(context); // 로그인 함수 호출
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppConstants.primaryColor, // 버튼 색상
@@ -82,15 +83,11 @@ class LoginFormState extends State<LoginForm> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 TextButton(
-                  onPressed: () {
-                    _navigateToForgotScreen(context); // context를 전달
-                  },
-                  child: const Text('아이디&비밀번호 찾기'),
+                  onPressed: onNavigateToForgot, // 비밀번호 찾기 함수 호출
+                  child: const Text('아이디 찾기&비밀번호 재설정'),
                 ),
                 TextButton(
-                  onPressed: () {
-                    _navigateToSignUpScreen(context); // context를 전달
-                  },
+                  onPressed: onNavigateToSignUp, // 회원가입 함수 호출
                   child: const Text('회원가입'),
                 ),
               ],
@@ -99,36 +96,5 @@ class LoginFormState extends State<LoginForm> {
         ),
       ),
     );
-  }
-
-  void _signIn(BuildContext context) async {
-    String email = _emailController.text.trim();
-    String password = _passwordController.text.trim();
-
-    // UserModel을 사용하여 로그인 시도
-    final userCredential = await _userModel.signIn(email, password);
-
-    if (userCredential != null) {
-      // Firestore에서 사용자 이름 가져오기
-      String? userName = await _userModel.getUserName(userCredential.user?.uid ?? '');
-
-      if (userName != null) {
-        showSuccessDialog(context, '$userName님 반갑습니다!', () {
-          Navigator.pushReplacementNamed(context, AppRoutes.tapPage); // TapPage로 이동
-        });
-      } else {
-        showErrorDialog(context, '사용자 정보를 찾을 수 없습니다.');
-      }
-    } else {
-      showErrorDialog(context, '로그인 중 오류가 발생했습니다.'); // 로그인 실패 시 에러 처리
-    }
-  }
-
-  void _navigateToForgotScreen(BuildContext context) {
-    Navigator.pushNamed(context, AppRoutes.forgotPassword);
-  }
-
-  void _navigateToSignUpScreen(BuildContext context) {
-    Navigator.pushNamed(context, AppRoutes.signUp);
   }
 }

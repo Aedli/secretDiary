@@ -16,7 +16,7 @@ class AppRoutes {
 
   static Map<String, WidgetBuilder> getRoutes() {
     return {
-      login: (context) => const LoginScreen(),
+      login: (context) => LoginScreen(),
       forgotPassword: (context) => ForgotPasswordScreen(),
       signUp: (context) => SignUpScreen(),
       account: (context) => const AccountPage(),
