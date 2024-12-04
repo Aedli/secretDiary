@@ -32,13 +32,13 @@ class DiaryCard extends StatelessWidget {
                   return child;  // 로딩 완료된 이미지 반환
                 } else {
                   return Center(
-                    child: CircularProgressIndicator(
+                    child: CircularProgressIndicator(//진행도 표기 원형
                       value: loadingProgress.expectedTotalBytes != null
                           ? loadingProgress.cumulativeBytesLoaded /
                           (loadingProgress.expectedTotalBytes ?? 1)
                           : null,
                     ),
-                  );  // 로딩 중에 원형 진행 표시기 표시
+                  );
                 }
               },
               errorBuilder: (context, error, stackTrace) {

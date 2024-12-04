@@ -4,12 +4,14 @@ import 'dart:io';
 import 'package:video_player/video_player.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:mypage/routes.dart';
 class DiarySave extends StatelessWidget {
   final String title;
   final String body;
   final File? file;
-  const DiarySave({Key? key, required this.title, required this.body, required this.file})
+  final String? imageUrl;
+  final bool? isVideo;
+  const DiarySave({Key? key, required this.title, required this.body, this.file, this.imageUrl, this.isVideo})
       : super(key: key);
 
   Future<void> _deleteDiary(BuildContext context) async {
@@ -29,15 +31,14 @@ class DiarySave extends StatelessWidget {
           .doc(diaryId)
           .delete();
 
-      // 삭제 성공 메시지
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('다이어리가 삭제되었습니다.'),
           backgroundColor: Colors.green,
         ),
       );
-
-      Navigator.pop(context); // 메인 화면으로 이동
+      //삭제하고 나서 새로고침(안하면 삭제된게 보임)
+      Navigator.pushReplacementNamed(context, AppRoutes.tapPage);
     } catch (e) {
       // 에러 발생 시
       ScaffoldMessenger.of(context).showSnackBar(
@@ -66,7 +67,7 @@ class DiarySave extends StatelessWidget {
             TextButton(
               onPressed: () {
                 Navigator.pop(context); // 다이얼로그 닫기
-                _deleteDiary(context); // 다이어리 삭제 함수 호출
+                _deleteDiary(context); // 다이어리 삭제
               },
               child: const Text("확인"),
             ),
@@ -78,10 +79,17 @@ class DiarySave extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('저장 완료'),
         backgroundColor: Colors.teal,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, AppRoutes.tapPage); // 원하는 경로로 이동
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -103,6 +111,23 @@ class DiarySave extends StatelessWidget {
                 width: double.infinity,
                 fit: BoxFit.cover,
               ),
+            if (imageUrl != null)
+              isVideo!=false
+                  ? AspectRatio(
+                aspectRatio: 6 / 6,
+                child: VideoPlayer(VideoPlayerController.networkUrl(Uri.parse(imageUrl!))
+                    ..initialize().then((_) {})),
+              )
+
+                  : Image.network(
+                imageUrl!,
+                height: 200,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+
+
+
             SizedBox(height: 16),
             Expanded(
               child: SingleChildScrollView(
@@ -122,7 +147,7 @@ class DiarySave extends StatelessWidget {
                         builder: (context) => DiaryWritePage(
                           initialTitle: title,
                           initialBody: body,
-                          initialFile: file,
+                          initialUrl: imageUrl,
                         ),
                       ),
                     );

@@ -10,7 +10,8 @@ class DiaryWritePage extends StatefulWidget {
   final String? initialTitle;
   final String? initialBody;
   final File? initialFile;
-  const DiaryWritePage({Key? key, this.initialTitle, this.initialBody, this.initialFile})
+  final String? initialUrl;
+  const DiaryWritePage({Key? key, this.initialTitle, this.initialBody, this.initialFile, this.initialUrl})
       : super(key: key);
 
   @override
@@ -20,6 +21,7 @@ class _DiaryWritePageState extends State<DiaryWritePage> {
   late TextEditingController _titleController;
   late TextEditingController _bodyController;
   File? _file;
+  String? _imageUrl;
   VideoPlayerController? _videoController; // 동영상 재생 컨트롤러
   final model = CreateModel();
   FirebaseFirestore _firestore=FirebaseFirestore.instance;
@@ -30,6 +32,7 @@ class _DiaryWritePageState extends State<DiaryWritePage> {
     _titleController = TextEditingController(text: widget.initialTitle);
     _bodyController = TextEditingController(text: widget.initialBody);
     _file = widget.initialFile; // 초기 파일 설정
+    _imageUrl=widget.initialUrl;
     if (_file != null && _file!.path.endsWith('.mp4')) {
       _videoController = VideoPlayerController.file(_file!)
         ..initialize().then((_) {
@@ -80,10 +83,9 @@ class _DiaryWritePageState extends State<DiaryWritePage> {
         return;
       }
 
-      // 다이어리 문서 ID 생성
+      // 다이어리 문서 ID 만들기
       String diaryId = title.replaceAll(' ', '_'); // 제목 기반 ID 생성
 
-      // Firebase Storage 참조 생성
       String? fileUrl;
       if (_file != null) {
         final storageRef = FirebaseStorage.instance
@@ -239,7 +241,39 @@ class _DiaryWritePageState extends State<DiaryWritePage> {
                 _file!,
                 width: 300,
                 height: 200,
+              )
+            else if (_imageUrl != null)
+              _imageUrl!.endsWith('.mp4') && _videoController != null
+                  ? Column(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        if (_videoController!.value.isPlaying) {
+                          _videoController!.pause();
+                        } else {
+                          _videoController!.play();
+                        }
+                      });
+                    },
+                    child: Container(
+                      width: 150,
+                      height: 200,
+                      child: AspectRatio(
+                        aspectRatio: _videoController!.value.aspectRatio,
+                        child: VideoPlayer(_videoController!),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+                  : Image.network(
+                _imageUrl!,
+                width: 300,
+                height: 200,
+                fit: BoxFit.cover,
               ),
+
             SizedBox(height: 16),
             Expanded(
               child: TextField(

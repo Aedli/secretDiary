@@ -29,6 +29,7 @@ class GridDiary extends StatelessWidget {
           "image": doc.data()["filePath"] ?? "",
           "text": doc.data()["title"] ?? "",
           "contents": doc.data()["content"] ?? "",
+          "isvideo": doc.data()["isVideo"] ?? "",
         };
       }).toList();
     } catch (e) {
@@ -57,7 +58,6 @@ class GridDiary extends StatelessWidget {
               ),
             );
           }
-
           final diaries = snapshot.data ?? [];
 
           if (diaries.isEmpty) {
@@ -86,8 +86,9 @@ class GridDiary extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (context) => DiarySave(
                         title: diaries[index]["text"] as String,
-                        body: diaries[index]["contents"] as String, // 필요시 내용 추가
-                        file: File(diaries[index]["image"] as String),
+                        body: diaries[index]["contents"] as String,
+                        imageUrl: diaries[index]["image"] as String,
+                        isVideo: diaries[index]["isvideo"] as bool,
                       ),
                     ),
                   );
