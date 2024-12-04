@@ -112,7 +112,7 @@ class DiarySave extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             if (imageUrl != null)
-              isVideo!=false
+              isVideo!=false// imageUrl.endsWith('.mp4')로 하니까 오류
                   ? AspectRatio(
                 aspectRatio: 6 / 6,
                 child: VideoPlayer(VideoPlayerController.networkUrl(Uri.parse(imageUrl!))
