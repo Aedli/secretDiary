@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../constants.dart';
 import '../routes.dart';
 import '../show_dialog.dart';
 import '../widgets/login_form.dart'; // LoginForm 위젯 임포트
@@ -23,14 +24,55 @@ class LoginScreen extends StatelessWidget {
           },
         ),
       ),
-      body: Center(
-        child: LoginForm(
-          emailController: _emailController,
-          passwordController: _passwordController,
-          onSignIn: (context) => _signIn(context), // 로그인 함수 전달
-          onNavigateToForgot: () => _navigateToForgotScreen(context), // 비밀번호 찾기 함수 전달
-          onNavigateToSignUp: () => _navigateToSignUpScreen(context), // 회원가입 함수 전달
-        ), // LoginForm 위젯 사용
+      body: SingleChildScrollView( // 스크롤 가능하게 변경
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // 둥글게 처리된 사각형으로 이미지 추가
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppConstants.elevatedBoxColor, // 배경 색상
+                    borderRadius: BorderRadius.circular(AppConstants.borderRadius), // 둥글기
+                    boxShadow: const [
+                      BoxShadow(
+                        color: AppConstants.boxShadowColor,
+                        blurRadius: 10.0,
+                        offset: Offset(0, 5), // 그림자 위치
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(AppConstants.borderRadius), // 둥글기 적용
+                    child: Image.asset(
+                      'assets/images/mydiary.png',
+                      height: 150, // 원하는 높이로 조정
+                      width: 320,  // 원하는 너비로 조정
+                      fit: BoxFit.cover, // 이미지 비율 유지
+                    ),
+                  ),
+                ),
+              ),
+              // 이미지와 LoginForm 사이에 간격 추가
+              const SizedBox(height: 20), // 원하는 간격으로 조정
+
+              // LoginForm 위젯
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0), // 좌우 패딩 추가
+                child: LoginForm(
+                  emailController: _emailController,
+                  passwordController: _passwordController,
+                  onSignIn: (context) => _signIn(context), // 로그인 함수 전달
+                  onNavigateToForgot: () => _navigateToForgotScreen(context), // 비밀번호 찾기 함수 전달
+                  onNavigateToSignUp: () => _navigateToSignUpScreen(context), // 회원가입 함수 전달
+                ),
+              ),
+              const SizedBox(height: 20), // 추가적인 간격 조정
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -76,7 +118,6 @@ class LoginScreen extends StatelessWidget {
       showErrorDialog(context, '로그인 중 오류가 발생했습니다.'); // 로그인 실패 시 에러 처리
     }
   }
-
 
   void _navigateToForgotScreen(BuildContext context) {
     Navigator.pushNamed(context, AppRoutes.forgotPassword);
