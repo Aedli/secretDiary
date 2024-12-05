@@ -207,4 +207,3 @@ class _SecretNumChangeState extends State<SecretNumChange> {
     );
   }
 }
-

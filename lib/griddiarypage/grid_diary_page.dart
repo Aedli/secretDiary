@@ -1,81 +1,103 @@
 import 'package:flutter/material.dart';
 import 'package:mypage/diarywritepage/diary_save.dart'; // DiarySave 화면 import
-
+import 'diary_card.dart'; // DiaryCard 위젯 import
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:io';
 class GridDiary extends StatelessWidget {
   const GridDiary({super.key});
 
+  Future<List<Map<String, dynamic>>> _fetchDiaries() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception('사용자가 로그인되어 있지 않습니다.');
+      }
+
+      final snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('diarys')
+          .get();
+
+      if (snapshot.docs.isEmpty) {
+        return [];
+      }
+
+      return snapshot.docs.map((doc) {
+        return {
+          "image": doc.data()["filePath"] ?? "",
+          "text": doc.data()["title"] ?? "",
+          "contents": doc.data()["content"] ?? "",
+          "isvideo": doc.data()["isVideo"] ?? "",
+        };
+      }).toList();
+    } catch (e) {
+      throw Exception('다이어리를 가져오는 중 오류가 발생했습니다: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // 이미지와 텍스트를 저장한 리스트
-    final List<Map<String, String>> items = [
-      {"image": "assets/images/test1.jpg", "text": "제목1"},
-      {"image": "assets/images/test1.jpg", "text": "제목2"},
-      {"image": "assets/images/test1.jpg", "text": "제목3"},
-      {"image": "assets/images/test1.jpg", "text": "제목4"},
-      {"image": "assets/images/test1.jpg", "text": "제목5"},
-      {"image": "assets/images/test1.jpg", "text": "제목6"},
-    ];
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("일기 모음"),
+        automaticallyImplyLeading: false, // 화살표 뒤로가기 버튼 제거
       ),
-      body: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 15.0,
-          mainAxisSpacing: 12.0,
-        ),
-        itemCount: items.length,
-        itemBuilder: (BuildContext con, int index) {
-          return diaryContainer(
-            image: items[index]["image"] as String,
-            diary_title: items[index]["text"] as String,
-            onTap: () {
-              // DiarySave 화면으로 이동
-              Navigator.push(
-                con,
-                MaterialPageRoute(
-                  builder: (context) => DiarySave(title: "ffff", body: "fffff",),
-                ),
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: _fetchDiaries(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                '오류가 발생했습니다: ${snapshot.error}',
+                style: const TextStyle(color: Colors.red),
+              ),
+            );
+          }
+          final diaries = snapshot.data ?? [];
+
+          if (diaries.isEmpty) {
+            return const Center(
+              child: Text(
+                "다이어리가 없습니다.",
+                style: TextStyle(fontSize: 18),
+              ),
+            );
+          }
+
+          return GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 15.0,
+              mainAxisSpacing: 12.0,
+            ),
+            itemCount: diaries.length,
+            itemBuilder: (BuildContext con, int index) {
+              return DiaryCard(
+                imageUrl: diaries[index]["image"] as String,
+                diaryTitle: diaries[index]["text"] as String,
+                onTap: () {
+                  Navigator.push(
+                    con,
+                    MaterialPageRoute(
+                      builder: (context) => DiarySave(
+                        title: diaries[index]["text"] as String,
+                        body: diaries[index]["contents"] as String,
+                        imageUrl: diaries[index]["image"] as String,
+                        isVideo: diaries[index]["isvideo"] as bool,
+                      ),
+                    ),
+                  );
+                },
               );
             },
           );
         },
-      ),
-    );
-  }
-
-  Widget diaryContainer({
-    required String image,
-    required String diary_title,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        height: 200,
-        color: Colors.white,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset(
-              image,
-              width: 150,
-              height: 150,
-              fit: BoxFit.cover,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              diary_title,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
       ),
     );
   }
