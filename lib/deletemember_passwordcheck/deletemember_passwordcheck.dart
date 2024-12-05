@@ -94,11 +94,6 @@ class _PasswordCheckState extends State<PasswordCheck> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: AppConstants.primaryColor,
-        title: const Text('회원 탈퇴'),
-      ),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
