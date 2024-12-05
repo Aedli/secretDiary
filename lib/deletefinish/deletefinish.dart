@@ -9,11 +9,6 @@ class DeleteFinish extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: AppConstants.primaryColor, // AppConstants에서 정의한 색상 사용
-        title: const Text('회원 탈퇴 완료'), // 제목 추가
-      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -37,7 +32,7 @@ class DeleteFinish extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 50), // 여백 조정
+            const SizedBox(height: 150), // 여백 조정
 
             Center(
               child: Container(

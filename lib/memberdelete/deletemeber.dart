@@ -1,7 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mypage/deletemember_passwordcheck/deletemember_passwordcheck.dart';
 import '../constants.dart'; // constants.dart 파일 임포트
+import '../routes.dart';
+import '../tappage/tapPage.dart'; // routes.dart 파일 임포트
 
 class DeleteMember extends StatelessWidget {
   const DeleteMember({super.key});
@@ -16,7 +17,7 @@ class DeleteMember extends StatelessWidget {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center, // 중앙 정렬
+          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // 회원 탈퇴 제목
@@ -66,11 +67,11 @@ class DeleteMember extends StatelessWidget {
                     ),
                   ],
                 ),
-                width: double.infinity, // 최대 너비 설정
+                width: double.infinity,
                 child: const Text(
                   '회원을 탈퇴하면 지금까지 작성한 \n모든 컨텐츠가 사라집니다.\n많은 소중한 추억들을 \n삭제해도 괜찮습니까?',
                   style: TextStyle(fontSize: 18),
-                  textAlign: TextAlign.left, // 왼쪽 정렬
+                  textAlign: TextAlign.left,
                 ),
               ),
             ),
@@ -78,11 +79,11 @@ class DeleteMember extends StatelessWidget {
 
             // 버튼들
             Row(
-              mainAxisAlignment: MainAxisAlignment.center, // 버튼을 중앙 정렬
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                OutlinedButton( // OutlinedButton 사용
+                OutlinedButton(
                   style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: Colors.black), // 테두리 색상 설정
+                    side: BorderSide(color: Colors.black),
                   ),
                   onPressed: () {
                     Navigator.push(
@@ -90,23 +91,27 @@ class DeleteMember extends StatelessWidget {
                       MaterialPageRoute(builder: (context) => PasswordCheck()),
                     );
                   },
-                  child: const Text('없애기'), // 버튼 텍스트
+                  child: const Text('없애기'),
                 ),
-                const SizedBox(width: 20), // 버튼 간격
-                ElevatedButton( // 돌아가기 버튼은 그대로 유지
+                const SizedBox(width: 20),
+                ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     foregroundColor: AppConstants.buttonTextColor,
                     backgroundColor: AppConstants.primaryColor,
                   ),
                   onPressed: () {
-                    Navigator.pop(context);
+                    // TapPage로 이동하면서 AccountPage 선택
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const TapPage(initialIndex: 2), // AccountPage로 가는 인덱스 설정
+                      ),
+                    );
                   },
                   child: const Text('돌아가기'),
                 ),
               ],
             ),
-
-
           ],
         ),
       ),

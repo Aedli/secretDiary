@@ -1,14 +1,13 @@
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mypage/deletefinish/deletefinish.dart';
 import '../constants.dart'; // constants.dart 파일 임포트
-import 'package:mypage/accountpage/account_page.dart'; // account_page 임포트 추가
+import 'package:mypage/tappage/tapPage.dart'; // TapPage 임포트 추가
 
 class PasswordCheck extends StatefulWidget {
-  PasswordCheck({super.key});
+  const PasswordCheck({super.key});
 
   @override
   _PasswordCheckState createState() => _PasswordCheckState();
@@ -94,11 +93,6 @@ class _PasswordCheckState extends State<PasswordCheck> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: AppConstants.primaryColor,
-        title: const Text('회원 탈퇴'),
-      ),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
@@ -149,10 +143,12 @@ class _PasswordCheckState extends State<PasswordCheck> {
                     backgroundColor: AppConstants.primaryColor,
                   ),
                   onPressed: () {
-                    // account_page로 이동
+                    // TapPage로 이동하면서 AccountPage 선택
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => AccountPage()),
+                      MaterialPageRoute(
+                        builder: (context) => const TapPage(initialIndex: 2), // AccountPage로 가는 인덱스 설정
+                      ),
                     );
                   },
                   child: const Text('돌아가기'),
