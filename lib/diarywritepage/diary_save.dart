@@ -5,7 +5,6 @@ import 'package:video_player/video_player.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mypage/routes.dart';
-import 'package:mypage/constants.dart';
 class DiarySave extends StatelessWidget {
   final String title;
   final String body;
