@@ -5,6 +5,8 @@
 # .env
 .env
 
+GoogleService-Info.plist
+
 ### Android ###
 # Gradle files
 .gradle/
