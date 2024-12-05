@@ -166,7 +166,7 @@ class DiarySave extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    _showDeleteDialog(context); // 삭제 다이얼로그 호출
+                    _showDeleteDialog(context); // 삭제 다이얼로그
                   },
                   child: const Text('삭제'),
                   style: ElevatedButton.styleFrom(
