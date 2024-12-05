@@ -11,7 +11,8 @@ class DiaryWritePage extends StatefulWidget {
   final String? initialBody;
   final File? initialFile;
   final String? initialUrl;
-  const DiaryWritePage({Key? key, this.initialTitle, this.initialBody, this.initialFile, this.initialUrl})
+  final bool? initialisVideo;
+  const DiaryWritePage({Key? key, this.initialTitle, this.initialBody, this.initialFile, this.initialUrl, this.initialisVideo})
       : super(key: key);
 
   @override
@@ -22,6 +23,7 @@ class _DiaryWritePageState extends State<DiaryWritePage> {
   late TextEditingController _bodyController;
   File? _file;
   String? _imageUrl;
+  bool? _isVideo;
   VideoPlayerController? _videoController; // 동영상 재생 컨트롤러
   final model = CreateModel();
   FirebaseFirestore _firestore=FirebaseFirestore.instance;
@@ -33,6 +35,7 @@ class _DiaryWritePageState extends State<DiaryWritePage> {
     _bodyController = TextEditingController(text: widget.initialBody);
     _file = widget.initialFile; // 초기 파일 설정
     _imageUrl=widget.initialUrl;
+    _isVideo=widget.initialisVideo;
     if (_file != null && _file!.path.endsWith('.mp4')) {
       _videoController = VideoPlayerController.file(_file!)
         ..initialize().then((_) {
@@ -240,35 +243,23 @@ class _DiaryWritePageState extends State<DiaryWritePage> {
                 height: 200,
               )
             else if (_imageUrl != null)
-              _imageUrl!.endsWith('.mp4') && _videoController != null
-                  ? Column(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        if (_videoController!.value.isPlaying) {
-                          _videoController!.pause();
-                        } else {
-                          _videoController!.play();
-                        }
-                      });
-                    },
-                    child: Container(
-                      width: 150,
-                      height: 200,
-                      child: AspectRatio(
-                        aspectRatio: _videoController!.value.aspectRatio,
-                        child: VideoPlayer(_videoController!),
-                      ),
-                    ),
-                  ),
-                ],
+              _isVideo!=false
+                  ? AspectRatio(
+                  aspectRatio: 6 / 6,
+                  child: VideoPlayer(VideoPlayerController.networkUrl(Uri.parse(_imageUrl!))
+                    ..initialize()
+                    ..setLooping(true)
+                    ..play().then((_) {}))
               )
                   : Image.network(
                 _imageUrl!,
                 width: 300,
                 height: 200,
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  // 실패 시 빈 화면
+                  return SizedBox.shrink();
+                },
               ),
 
             SizedBox(height: 16),

@@ -82,7 +82,6 @@ class DiarySave extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('저장 완료'),
         backgroundColor: Colors.teal,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -128,13 +127,9 @@ class DiarySave extends StatelessWidget {
                 height: 200,
                 width: double.infinity,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {//실패시 기본이미지로
-                  return Image.asset(
-                    'assets/images/test1.jpg',
-                    height: 200,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  );
+                errorBuilder: (context, error, stackTrace) {
+                  // 실패 시 빈 화면
+                  return SizedBox.shrink();
                 },
               ),
 
