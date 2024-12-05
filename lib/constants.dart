@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 
 class AppConstants {
-  static const Color primaryColor = Color(0xFF6200EE); // 기본 버튼 색상
+  static const Color primaryColor = Color(0xFF87CEEB); // 기본 버튼 색상
   static const Color backgroundColor = Colors.white; // 배경 색상
   static const Color hintColor = Colors.grey; // 힌트 색상
   static const Color buttonTextColor = Colors.white; // 버튼 텍스트 색상
   static const double borderRadius = 12.0; // 둥글기
-  static const TextStyle labelTextStyle =
-  TextStyle(fontSize: 16); // 레이블 텍스트 스타일
+  static const TextStyle labelTextStyle = TextStyle(fontSize: 16); // 레이블 텍스트 스타일
   static const Color errorColor = Colors.red; // 오류 메시지 색상
   static const Color successColor = Colors.green; // 성공 메시지 색상
+
+  // 추가: 명암 효과를 위한 색상
+  static const Color boxShadowColor = Color(0xFFB0BEC5); // 그림자 색상
+  static const Color elevatedBoxColor = Color(0xFFECEFF1); // 박스 배경 색상
 
   static const TextStyle errorMessageStyle = TextStyle(color: Colors.red);
   static const TextStyle successMessageStyle = TextStyle(color: Colors.green);

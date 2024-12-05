@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mypage/deletefinish/deletefinish.dart';
+import '../constants.dart'; // constants.dart 파일 임포트
+import 'package:mypage/accountpage/account_page.dart'; // account_page 임포트 추가
 
 class PasswordCheck extends StatefulWidget {
   PasswordCheck({super.key});
@@ -15,21 +17,18 @@ class PasswordCheck extends StatefulWidget {
 class _PasswordCheckState extends State<PasswordCheck> {
   final _passwordController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance; // Firestore 인스턴스 생성
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // 비밀번호 확인 및 계정 삭제 함수
   Future<void> _deleteAccount() async {
     String password = _passwordController.text;
     User? user = _auth.currentUser;
 
-    // 비밀번호 입력이 비어있는지 확인
     if (password.isEmpty) {
       _showErrorDialog('비밀번호를 입력해주세요.');
       return;
     }
 
     try {
-      // 기존 비밀번호로 사용자 재인증
       AuthCredential credential = EmailAuthProvider.credential(
         email: user!.email!,
         password: password,
@@ -37,9 +36,8 @@ class _PasswordCheckState extends State<PasswordCheck> {
       await user.reauthenticateWithCredential(credential);
 
       final diaryCollectionRef = _firestore.collection('users').doc(user.uid).collection('diarys');
-      final QuerySnapshot<Map<String, dynamic>> diarySnapshot = await diaryCollectionRef.get(); // 선언과 초기화 완료
+      final QuerySnapshot<Map<String, dynamic>> diarySnapshot = await diaryCollectionRef.get();
 
-// 다이어리 파일 삭제 및 Firestore 문서 삭제
       for (var doc in diarySnapshot.docs) {
         final data = doc.data();
         final String? filePath = data['filePath'];
@@ -47,25 +45,17 @@ class _PasswordCheckState extends State<PasswordCheck> {
         if (filePath != null) {
           try {
             final storageRef = FirebaseStorage.instance.ref();
-            // Storage 파일 삭제
             await storageRef.child(Uri.decodeFull(filePath.split('o/')[1].split('?')[0])).delete();
           } catch (e) {
             print("파일 삭제 실패: $e");
           }
         }
-        await doc.reference.delete(); // Firestore 다이어리 문서 삭제
-      }
-      for (var doc in diarySnapshot.docs) {
-        await doc.reference.delete(); // 다이어리 문서 삭제
+        await doc.reference.delete();
       }
 
-      // Firestore에서 사용자 정보 삭제
       await _firestore.collection('users').doc(user.uid).delete();
-
-      // 계정 삭제
       await user.delete();
 
-      // 계정 삭제 후 안내 페이지로 이동
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -73,7 +63,6 @@ class _PasswordCheckState extends State<PasswordCheck> {
         ),
       );
     } on FirebaseAuthException catch (e) {
-      // 오류 처리: 비밀번호가 틀린 경우
       if (e.code == 'wrong-password') {
         _showErrorDialog('비밀번호가 틀렸습니다.');
       } else {
@@ -82,20 +71,19 @@ class _PasswordCheckState extends State<PasswordCheck> {
     }
   }
 
-  // 오류 메시지 Dialog
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('오류'),
+          title: Text('오류', style: TextStyle(color: AppConstants.primaryColor)),
           content: Text(message),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(context); // Dialog 닫기
+                Navigator.pop(context);
               },
-              child: Text('확인'),
+              child: Text('확인', style: TextStyle(color: AppConstants.primaryColor)),
             ),
           ],
         );
@@ -107,23 +95,26 @@ class _PasswordCheckState extends State<PasswordCheck> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false, // 화살표 뒤로가기 버튼 제거
-        backgroundColor: Colors.blue,
+        automaticallyImplyLeading: false,
+        backgroundColor: AppConstants.primaryColor,
+        title: const Text('회원 탈퇴'),
       ),
       body: Center(
         child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // 회원 탈퇴 제목
               Center(
                 child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: Colors.black),
                   ),
-                  child: Text(
+                  child: const Text(
                     '회원 탈퇴',
                     style: TextStyle(
                       fontSize: 24,
@@ -132,8 +123,11 @@ class _PasswordCheckState extends State<PasswordCheck> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
-              Text('비밀번호 확인'),
+              const SizedBox(height: 20),
+
+              // 비밀번호 확인 텍스트 및 입력 필드
+              const Text('비밀번호 확인', style: TextStyle(fontSize: 18)),
+              const SizedBox(height: 8),
               TextFormField(
                 controller: _passwordController,
                 decoration: InputDecoration(
@@ -141,43 +135,43 @@ class _PasswordCheckState extends State<PasswordCheck> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                 ),
                 obscureText: true,
               ),
-              SizedBox(height: 20),
-              SizedBox(height: 40),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: Colors.blue, // 버튼 텍스트 색 변경
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context); // Back 버튼 클릭 시 뒤로 가기
-                    },
-                    child: Text('돌아가기'),
-                  ),
-                ],
-              ),
-              SizedBox(height: 120),
+              const SizedBox(height: 20),
+
+              // 돌아가기 버튼
               Center(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: _deleteAccount, // 탈퇴하기 버튼 클릭 시 계정 삭제
-                      child: Text(
-                        '탈퇴하기',
-                        style: TextStyle(
-                          decoration: TextDecoration.underline, // 밑줄 추가
-                          fontSize: 18, // 글자 크기 (옵션)
-                          fontWeight: FontWeight.bold, // 글자 두께 (옵션)
-                        ),
-                      ),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: AppConstants.primaryColor,
+                  ),
+                  onPressed: () {
+                    // account_page로 이동
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => AccountPage()),
+                    );
+                  },
+                  child: const Text('돌아가기'),
+                ),
+              ),
+              const SizedBox(height: 200), // "돌아가기" 버튼과 "탈퇴하기" 버튼 사이의 여백 증가
+
+              // 탈퇴하기 텍스트는 그대로 두기
+              Center(
+                child: GestureDetector(
+                  onTap: _deleteAccount,
+                  child: const Text(
+                    '탈퇴하기',
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
                     ),
-                  ],
+                  ),
                 ),
               ),
             ],

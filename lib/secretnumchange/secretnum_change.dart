@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../constants.dart'; // constants.dart 파일 임포트
 
 class SecretNumChange extends StatefulWidget {
   const SecretNumChange({super.key});
@@ -20,40 +21,30 @@ class _SecretNumChangeState extends State<SecretNumChange> {
   Future<void> _changePassword() async {
     User? user = _auth.currentUser;
 
-    // 비밀번호가 일치하는지 확인
     String currentPassword = _currentPasswordController.text;
     String newPassword = _newPasswordController.text;
     String confirmPassword = _confirmNewPasswordController.text;
 
-    // 비밀번호가 일치하지 않으면 알림
     if (newPassword != confirmPassword) {
       _showErrorDialog('비밀번호가 일치하지 않습니다.');
       return;
     }
 
-    // 비밀번호가 비어있으면 알림
     if (newPassword.isEmpty || currentPassword.isEmpty) {
       _showErrorDialog('비밀번호를 모두 입력하세요.');
       return;
     }
 
     try {
-      // 사용자 인증 확인
       AuthCredential credential = EmailAuthProvider.credential(
         email: user!.email!,
         password: currentPassword,
       );
 
-      // 기존 비밀번호로 사용자 재인증
       await user.reauthenticateWithCredential(credential);
-
-      // 비밀번호 변경
       await user.updatePassword(newPassword);
-
-      // 비밀번호 변경 성공 후 알림
       _showSuccessDialog('비밀번호가 성공적으로 변경되었습니다.');
     } on FirebaseAuthException catch (e) {
-      // 오류 처리
       if (e.code == 'wrong-password') {
         _showErrorDialog('기존 비밀번호가 틀렸습니다.');
       } else {
@@ -109,10 +100,12 @@ class _SecretNumChangeState extends State<SecretNumChange> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false, // 화살표 뒤로가기 버튼 제거
+        title: const Text('비밀번호 변경'),
+        automaticallyImplyLeading: false,
       ),
-      body: Center(
-        child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,13 +113,13 @@ class _SecretNumChangeState extends State<SecretNumChange> {
               // 회원 수정 Text
               Center(
                 child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(AppConstants.borderRadius),
                     border: Border.all(color: Colors.black),
                   ),
-                  child: Text(
-                    '회원 수정',
+                  child: const Text(
+                    '비밀번호 변경',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -134,49 +127,19 @@ class _SecretNumChangeState extends State<SecretNumChange> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               // 기존 비밀번호
-              Text('기존 비밀번호'),
-              TextFormField(
-                controller: _currentPasswordController,
-                decoration: InputDecoration(
-                  hintText: '기존 비밀번호 입력',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                obscureText: true,
-              ),
-              SizedBox(height: 20),
+              _buildPasswordField('기존 비밀번호', _currentPasswordController),
+              const SizedBox(height: 20),
 
               // 신규 비밀번호
-              Text('신규 비밀번호'),
-              TextFormField(
-                controller: _newPasswordController,
-                decoration: InputDecoration(
-                  hintText: '신규 비밀번호 입력',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                obscureText: true,
-              ),
-              SizedBox(height: 20),
+              _buildPasswordField('신규 비밀번호', _newPasswordController),
+              const SizedBox(height: 20),
 
               // 비밀번호 확인
-              Text('신규 비밀번호 확인'),
-              TextFormField(
-                controller: _confirmNewPasswordController,
-                decoration: InputDecoration(
-                  hintText: '신규 비밀번호 확인 입력',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                obscureText: true,
-              ),
-              SizedBox(height: 20),
+              _buildPasswordField('신규 비밀번호 확인', _confirmNewPasswordController),
+              const SizedBox(height: 20),
 
               // 버튼들
               Row(
@@ -184,19 +147,21 @@ class _SecretNumChangeState extends State<SecretNumChange> {
                 children: [
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white, backgroundColor: Colors.blue, // 버튼 텍스트 색 변경
+                      foregroundColor: AppConstants.buttonTextColor,
+                      backgroundColor: AppConstants.primaryColor, // 버튼 텍스트 색상
                     ),
                     onPressed: () {
                       Navigator.pop(context); // Back 버튼 클릭 시 뒤로 가기
                     },
-                    child: Text('Back'),
+                    child: const Text('Back'),
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white, backgroundColor: Colors.blue, // 버튼 텍스트 색 변경
+                      foregroundColor: AppConstants.buttonTextColor,
+                      backgroundColor: AppConstants.primaryColor, // 버튼 텍스트 색상
                     ),
                     onPressed: _changePassword, // 수정 버튼 클릭 시 비밀번호 변경
-                    child: Text('수정'),
+                    child: const Text('수정'),
                   ),
                 ],
               ),
@@ -204,6 +169,25 @@ class _SecretNumChangeState extends State<SecretNumChange> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildPasswordField(String label, TextEditingController controller) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 16)),
+        TextFormField(
+          controller: controller,
+          decoration: InputDecoration(
+            hintText: '비밀번호 입력',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+            ),
+          ),
+          obscureText: true,
+        ),
+      ],
     );
   }
 }
