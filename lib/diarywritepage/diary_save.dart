@@ -5,6 +5,7 @@ import 'package:video_player/video_player.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mypage/routes.dart';
+import 'package:mypage/constants.dart';
 class DiarySave extends StatelessWidget {
   final String title;
   final String body;
@@ -82,7 +83,7 @@ class DiarySave extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.teal,
+        backgroundColor: Color(0xFF87CEEB),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -153,13 +154,14 @@ class DiarySave extends StatelessWidget {
                           initialTitle: title,
                           initialBody: body,
                           initialUrl: imageUrl,
+                          initialisVideo: isVideo,
                         ),
                       ),
                     );
                   },
                   child: const Text('수정'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
+                    backgroundColor: Color(0xFF87CEEB),
                   ),
                 ),
                 ElevatedButton(

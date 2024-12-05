@@ -201,7 +201,7 @@ class _DiaryWritePageState extends State<DiaryWritePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('다이어리 작성'),
-        backgroundColor: Colors.teal,
+        backgroundColor: Color(0xFF87CEEB),
         automaticallyImplyLeading: false, // 화살표 뒤로가기 버튼 제거
       ),
       body: Padding(
@@ -217,30 +217,19 @@ class _DiaryWritePageState extends State<DiaryWritePage> {
             ),
             SizedBox(height: 16),
             if (_file != null)
-              _file!.path.endsWith('.mp4') && _videoController != null
-                  ? Column(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _videoController!.play();
-                      });
-                    },
-                    child: Container(
-                      width: 150,
-                      height: 200,
-                      child: AspectRatio(
-                        aspectRatio: _videoController!.value.aspectRatio,
-                        child: VideoPlayer(_videoController!),
-                      ),
-                    ),
-                  ),
-                ],
+              _file!.path.endsWith('.mp4')
+                  ? AspectRatio(
+                  aspectRatio:  6/6,
+                  child: VideoPlayer(VideoPlayerController.file(_file!)
+                    ..initialize()
+                    ..setLooping(true)
+                    ..play().then((_) {}))
               )
                   : Image.file(
                 _file!,
-                width: 300,
                 height: 200,
+                width: double.infinity,
+                fit: BoxFit.cover,
               )
             else if (_imageUrl != null)
               _isVideo!=false
@@ -248,13 +237,12 @@ class _DiaryWritePageState extends State<DiaryWritePage> {
                   aspectRatio: 6 / 6,
                   child: VideoPlayer(VideoPlayerController.networkUrl(Uri.parse(_imageUrl!))
                     ..initialize()
-                    ..setLooping(true)
                     ..play().then((_) {}))
               )
                   : Image.network(
                 _imageUrl!,
-                width: 300,
                 height: 200,
+                width: double.infinity,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   // 실패 시 빈 화면
@@ -286,14 +274,14 @@ class _DiaryWritePageState extends State<DiaryWritePage> {
                   icon: Icon(Icons.upload),
                   label: Text('업로드'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
+                    backgroundColor: Color(0xFF87CEEB),
                   ),
                 ),
                 ElevatedButton(
                   onPressed: _saveEntry,
                   child: Text('저장'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
+                    backgroundColor: Color(0xFF87CEEB),
                   ),
                 ),
               ],
