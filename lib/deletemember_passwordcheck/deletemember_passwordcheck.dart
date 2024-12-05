@@ -1,3 +1,4 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -34,6 +35,29 @@ class _PasswordCheckState extends State<PasswordCheck> {
         password: password,
       );
       await user.reauthenticateWithCredential(credential);
+
+      final diaryCollectionRef = _firestore.collection('users').doc(user.uid).collection('diarys');
+      final QuerySnapshot<Map<String, dynamic>> diarySnapshot = await diaryCollectionRef.get(); // 선언과 초기화 완료
+
+// 다이어리 파일 삭제 및 Firestore 문서 삭제
+      for (var doc in diarySnapshot.docs) {
+        final data = doc.data();
+        final String? filePath = data['filePath'];
+
+        if (filePath != null) {
+          try {
+            final storageRef = FirebaseStorage.instance.ref();
+            // Storage 파일 삭제
+            await storageRef.child(Uri.decodeFull(filePath.split('o/')[1].split('?')[0])).delete();
+          } catch (e) {
+            print("파일 삭제 실패: $e");
+          }
+        }
+        await doc.reference.delete(); // Firestore 다이어리 문서 삭제
+      }
+      for (var doc in diarySnapshot.docs) {
+        await doc.reference.delete(); // 다이어리 문서 삭제
+      }
 
       // Firestore에서 사용자 정보 삭제
       await _firestore.collection('users').doc(user.uid).delete();
