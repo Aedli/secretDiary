@@ -18,6 +18,7 @@ class AccountPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('계정 페이지'),
+        automaticallyImplyLeading: false,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
