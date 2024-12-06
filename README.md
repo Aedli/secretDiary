@@ -1,16 +1,22 @@
-# mypage
+# 프로젝트 이름  
+Flutter와 Firebase를 활용한 SNS 앱
 
-A new Flutter project.
+## 주요 기능
+- **사용자 관리**
+  - 로그인/회원가입/정보 수정
+- **다이어리 기능**
+  - 다이어리 작성, 수정, 삭제
+  - 이미지 및 동영상 업로드
 
-## Getting Started
+## 설치 및 실행 방법
+1. **Flutter 및 Dart 설치**
+   - [Flutter 설치 가이드](https://docs.flutter.dev/get-started/install)
+   - Dart는 Flutter에 포함되어 있습니다.
+2. 리포지토리 클론: `git clone [https://github.com/username/repo.git](https://github.com/Aedli/secretDiary.git)`
+3. 패키지 설치: `flutter pub get`
+4. 앱 실행: `flutter run`
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 기술 스택
+- Flutter
+- Firebase
+- Dart
