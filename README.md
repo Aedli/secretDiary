@@ -1,5 +1,5 @@
 # 프로젝트 이름  
-Flutter와 Firebase를 활용한 SNS 앱
+Flutter와 Firebase를 활용한 개인용 다이어리 앱
 
 ## 주요 기능
 - **사용자 관리**
