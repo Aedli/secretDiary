@@ -20,6 +20,11 @@ Flutter와 Firebase를 활용한 개인용 다이어리 앱
 - Flutter
 - Firebase
 - Dart
+- 
+## 다운로드
+최신 APK 파일을 아래 링크에서 다운로드할 수 있습니다:  
+[앱 다운로드 (Google Drive)](https://drive.google.com/file/d/1aj84MLSds45YFquMuJhz4Go_zryA0yHh/view?usp=sharing)
+
 
 ## 라이선스
 이 프로젝트는 BSD 3-Clause License 하에 배포됩니다. 아래는 해당 라이선스의 전문입니다.
